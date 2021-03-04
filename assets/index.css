@@ -1,0 +1,89 @@
+*
+{
+    font-family: 'VT323', monospace;
+    margin: 0; 
+    padding: 0; 
+}
+
+body
+{
+    text-align: center;
+    background-image: url("pagebg.png");
+    background-size: 100% auto;
+    background-repeat: no-repeat; 
+    background-color: #201a7a;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+    scroll-behavior: smooth;
+}
+
+body::-webkit-scrollbar {
+    display: none;
+  }
+
+canvas
+{
+    margin-left: 1px;
+    margin-top: 16%;
+    background: url("bg.png") no-repeat center;
+    background-size: cover;
+    image-rendering: optimizeSpeed;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: -o-crisp-edges;       
+    image-rendering: pixelated;
+}
+
+#content
+{
+    margin-top: 18%;
+}
+
+
+.btn
+{
+    padding: 30px;
+    cursor: pointer;
+    border: 0;
+    outline: 0;
+    font-size: 40px;
+    -webkit-tap-highlight-color: transparent;
+    margin-bottom: 30px;
+    border-radius: 3px;
+    color: whitesmoke;
+    background-color: rgb(112, 112, 230);
+}
+
+.btn:hover
+{
+    background-color: rgb(93, 93, 196);
+}
+
+.btn:active
+{
+    background-color: rgb(93, 93, 196);
+    transform: translateY(3px);
+}
+
+#notify
+{
+    font-size: 50px;
+    color: green;
+    margin-bottom: 25px;
+}
+
+.smolimg
+{
+    width: 14%;
+    height: auto;
+    vertical-align: middle;
+}
+
+.info
+{
+    margin-left: 30px;
+    font-size: 2.8vmax;
+    color: white;
+    vertical-align: middle;
+    display: inline-block;
+}
