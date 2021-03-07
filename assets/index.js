@@ -451,7 +451,7 @@ function run(time) {
     game.step(time);
     if (!game.died)
     {
-        setTimeout(() => { requestAnimationFrame(run)}, 50);
+        setTimeout(() => { requestAnimationFrame(run)}, 140);
     }
     else 
     {
