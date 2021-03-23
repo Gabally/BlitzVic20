@@ -1,6 +1,9 @@
 const canvas = document.getElementById("maingame");
 const ctx = canvas.getContext("2d");
 
+canvas.width = 1280;
+canvas.height = 739;
+
 function craft_img(src, w=null,h=null)
 {
     let tmp = new Image();
@@ -24,7 +27,6 @@ class AnimationSPRT
         this.frames = [];
         let img = new Image();
         img.src = imgsrc;
-        this.name = name;
         img.onload = () => {
             let tmpcanvas = document.createElement("canvas");
             let context = tmpcanvas.getContext("2d");
@@ -71,24 +73,21 @@ class Sprite
         this.tolerance = 20;
     }
 
-    update(time, scale)
+    update(time)
     {
         this.x += this.vx;
         this.y += this.vy
     }
 
-    draw(time, scale) 
+    draw(time) 
     {
-        ctx.drawImage(this.image, this.x*scale, this.y*scale, this.width*scale, this.height*scale);
-        //ctx.beginPath();
-        //ctx.rect(this.x, this.y, this.width, this.height);
-        //ctx.stroke();
+        ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
     }
 
-    collides(obj, scale)
+    collides(obj)
     {
-        return !(obj.x*scale + obj.width - obj.tolerance < this.x*scale + this.tolerance || this.x*scale + this.width - this.tolerance < obj.x*scale + obj.tolerance) && 
-        !(obj.y*scale + obj.height - obj.tolerance < this.y*scale  + this.tolerance || this.y*scale + this.height -this.tolerance < obj.y*scale + obj.tolerance);
+        return !(obj.x + obj.width - obj.tolerance < this.x + this.tolerance || this.x + this.width - this.tolerance < obj.x + obj.tolerance) && 
+        !(obj.y + obj.height - obj.tolerance < this.y  + this.tolerance || this.y + this.height -this.tolerance < obj.y + obj.tolerance);
     }
 }
 
@@ -105,7 +104,7 @@ class Player
         this.image = craft_img("assets/plane1.png", 64, 18);
         this.alive = true;
         this.tolerance = 1;
-        this.speed = 4;
+        this.speed = 15;
         this.sources = [
             craft_img("assets/plane1.png", 64, 18),
             craft_img("assets/plane2.png", 64, 18)
@@ -116,22 +115,22 @@ class Player
         this.deathSound = new Audio("assets/explosion.mp3");
     }
 
-    draw(time, scale) 
+    draw(time) 
     {
         try
         {
-            ctx.drawImage(this.image, this.x*scale, this.y*scale, this.width*scale, this.height*scale);
+            ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
         }
         catch{}
     }
 
-    update(time, scale)
+    update(time)
     {
         //this.gnd = canvas.height - (canvas.height/100)* this.groundline;
         this.x += this.speed;
-        if (this.x*scale >= canvas.width)
+        if (this.x >= canvas.width)
         {
-            this.y += 10;
+            this.y += 60;
             this.x = -10;
         }
         if ((time - this.lastChange) > this.deltaAnime)
@@ -154,7 +153,6 @@ class Game
     constructor()
         {
             window.addEventListener("DOMContentLoaded", ()=> {
-                this.first_resize();
                 if(!window.localStorage.getItem("highscore"))
                 {
                     this.highScore = 0;
@@ -164,18 +162,11 @@ class Game
                 {
                     this.highScore = window.localStorage.getItem("highscore");
                 }
-            });
-            window.onresize = (e)=> {
-                clearTimeout(this.doit);
-                this.doit = setTimeout((e)=> {
-                    this.resize_canvas(e);
-                }, 500);
-            };            
-            this.scale = 1;
+            });         
             this.doit = "";
             this.buildings = new ListFactory();
             //new Building(canvas.width/2, canvas.height/2);
-            this.player = new Player(-30, 10, 21, 6, 10);
+            this.player = new Player(-30, 80, 80, 30, 600);
             this.bomb = undefined;
             window.addEventListener("keydown", (e)=>{
                 if (e.code == "Space")
@@ -209,31 +200,6 @@ class Game
             this.tped = false;
         }
 
-        first_resize(e)
-        {
-            this.oldsize = canvas.width;
-            this.resize_canvas(e);
-        }
-
-        resize_canvas(e)
-        {
-            canvas.width = window.innerWidth*0.49;
-            canvas.height =  (canvas.width/16) * 9;
-            if (canvas.height > window.innerHeight)
-            {
-                canvas.height = window.innerHeight*0.49;
-                canvas.width = (canvas.height/9)*16;
-            }
-            if (this.oldsize > canvas.width)
-            {
-                this.scale = this.oldsize/canvas.width;
-            }
-            else 
-            {
-                this.scale = canvas.width/this.oldsize;
-            }
-        }
-
         dropBomb()
         {
             this.bomb = new Bomb(this.player.x, this.player.y);
@@ -244,7 +210,7 @@ class Game
             this.tped = false;
             this.died = false;
             this.points = 0;
-            this.player = new Player(-30, 40, 21, 6, 10);
+            this.player = new Player(-30, 80, 100, 40, 600);
             this.bomb = undefined;
             this.buildings = new ListFactory();
             this.currentTime = 0;
@@ -262,18 +228,18 @@ class Game
 
         update(time)
         {
-            if (this.buildings.empty() && !this.tped && this.player.x*this.scale >= canvas.width-this.player.width*this.scale)
+            if (this.buildings.empty() && !this.tped && this.player.x >= canvas.width-this.player.width)
             {
                 this.tped = true;
                 this.player.x = -10;
-                this.player.y = (canvas.height - this.player.height*this.scale*2)/this.scale;
+                this.player.y = canvas.height - this.player.height;
             }
-            this.player.update(time, this.scale);
+            this.player.update(time);
             if (this.bomb){
                 this.bomb.update();
                 this.buildings = this.buildings.reduce(
                     (b, a) => {
-                        if (this.bomb && b.collides(this.bomb, this.scale*0.4))
+                        if (this.bomb && b.collides(this.bomb))
                         {
                             b.pieces -= 1;
                             this.points += 300;
@@ -291,13 +257,13 @@ class Game
                         },
                     new ListFactory()
                 );
-                if (this.bomb && this.bomb.y*this.scale >= canvas.height)
+                if (this.bomb && this.bomb.y >= (canvas.height+70))
                 {
                     this.bomb = undefined;
                 }
             }
             this.buildings.visit(b => {
-                if (b.planeCollides(this.player, this.scale*0.4))
+                if (b.planeCollides(this.player))
                 {
                     this.player.deathSound.play();
                     this.died = true;
@@ -310,9 +276,9 @@ class Game
                         ctx.clearRect(0, 0, canvas.width, canvas.height);
                     }, 3000);
                 }
-                b.update(time, this.scale*0.4);
+                b.update(time);
             });
-            if ((this.player.y*this.scale) >= (canvas.height-(this.player.height*this.scale*2)) && (this.player.x*this.scale >= canvas.width-(this.player.width*this.scale*2)))
+            if ((this.player.y) >= (canvas.height-(this.player.height)) && (this.player.x >= canvas.width-(this.player.width)))
             {
                 this.died = true;
                 this.windSound.play();
@@ -330,24 +296,24 @@ class Game
             ctx.mozImageSmoothingEnabled = false;
             ctx.msImageSmoothingEnabled = false;
             ctx.imageSmoothingEnabled = false;
-            this.player.draw(time, this.scale);
+            this.player.draw(time);
             if (this.bomb)
             { 
-                this.bomb.draw(time, this.scale); 
+                this.bomb.draw(time); 
             }
             this.buildings.visit(b => {
-                b.draw(time, this.scale*0.4);
+                b.draw(time);
             });
             ctx.textBaseline = "bottom";
-            ctx.font = "35px VT323";
+            ctx.font = "45px VT323";
             ctx.fillStyle = "#901ccc";
-            ctx.drawImage(this.scoreImg, 30, 30, this.scoreImg.width*this.scale*0.3, this.scoreImg.height*this.scale*0.3);
-            ctx.fillText(this.points, 40+this.scoreImg.width*this.scale*0.3, 53);
-            ctx.drawImage(this.bestImg, canvas.width-(this.bestImg.width*(this.scale*0.7)), 28, this.bestImg.width*this.scale*0.3, this.bestImg.height*this.scale*0.3);
+            ctx.drawImage(this.scoreImg, 30, 30, this.scoreImg.width, this.scoreImg.height+10);
+            ctx.fillText(this.points, 40+this.scoreImg.width, 64);
+            ctx.drawImage(this.bestImg, 970, 30, this.bestImg.width, this.bestImg.height+10);
             ctx.textBaseline = "bottom";
-            ctx.font =  "35px VT323";
+            ctx.font =  "45px VT323";
             ctx.fillStyle = "#901ccc";
-            ctx.fillText(this.highScore, canvas.width-40*this.scale, 50);
+            ctx.fillText(this.highScore, 1100, 64);
         }
 
         step(time)
@@ -375,14 +341,14 @@ class Bomb extends Sprite
 {
     constructor(x, y)
     {
-        super("assets/bomb.png", x, y, 16, 16, 0, 10);
+        super("assets/bomb.png", x, y, 24, 24, 0, 40);
         this.sound = new Audio("assets/bomb.mp3");
         this.sound.cloneNode().play();
     }
 
-    draw(time, scale) 
+    draw(time) 
     {
-        ctx.drawImage(this.image, this.x*scale, this.y*scale, this.width*scale/3, this.height*scale/3);
+        ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
     }
 }
 
@@ -391,16 +357,16 @@ class Building
     constructor (x)
     {
         let aviableBuildings = [
-            {src: "assets/building1.png", w: 28, h: 48, p: 2},
-            {src: "assets/building2.png", w: 28, h: 176, p: 7},
-            {src: "assets/building3.png", w: 28, h: 96, p: 3},
-            {src: "assets/building4.png", w: 28, h: 112, p: 6},
-            {src: "assets/building5.png", w: 28, h: 64, p: 3},
-            {src: "assets/building6.png", w: 28, h: 128, p: 5},
+            {src: "assets/building1.png", w: 56, h: 96, p: 2},
+            {src: "assets/building2.png", w: 56, h: 352, p: 7},
+            {src: "assets/building3.png", w: 56, h: 192, p: 3},
+            {src: "assets/building4.png", w: 56, h: 224, p: 6},
+            {src: "assets/building5.png", w: 56, h: 128, p: 3},
+            {src: "assets/building6.png", w: 56, h: 256, p: 5},
         ]
         let randomBuilding = aviableBuildings[Math.floor(Math.random() * aviableBuildings.length)];
         this.x = x;
-        this.y = canvas.height*0.2;
+        this.y = 710 - randomBuilding.h;
         this.w = randomBuilding.w;
         this.h = randomBuilding.h;
         this.p = randomBuilding.p;
@@ -408,50 +374,52 @@ class Building
         this.pieces = randomBuilding.p;
         this.image = craft_img(randomBuilding.src, randomBuilding.w, randomBuilding.h);
         this.tolerance = 3;
+        console.log(this.h);
+        console.log(this.s * this.pieces);
     }
 
-    draw(time, scale) 
+    draw(time) 
     {
-        ctx.drawImage(this.image, 
-            0, 
-            this.s*(this.p - this.pieces),
-            this.w,
-            this.s*this.pieces,
-            this.x*scale,
-            this.y,
-             this.w*scale, 
-             (this.s * this.pieces)*scale);
+        ctx.drawImage(this.image, // Image
+            0, // Source X
+            this.s*(this.p - this.pieces), // Source Y
+            this.w, // Source width
+            this.s*this.pieces, // Source heigth
+            this.x, // Dest X
+            this.y, // Dest Y
+             this.w, // Dest width 
+             (this.s * this.pieces)); // Dest heigth
     }
     
-    update(time, scale)
+    update(time)
     {
-        this.y = canvas.height - (((this.s * this.pieces) + 12)*scale); 
+        this.y = 710 - (this.s * this.pieces); 
         this.h = this.s * this.pieces;
     }
 
-    collides(obj, scale)
+    collides(obj)
     {
-        let nScale = (scale/0.4);
-        return !(((obj.x*nScale) + (obj.width*(nScale/3))) < this.x*scale || this.x*scale + this.w*scale < (obj.x*nScale)) && 
-        !((obj.y*nScale) + (obj.height * (nScale/3)) < this.y || this.y + this.h*scale < (obj.y*nScale));
+        return !((obj.x + obj.width) < this.x || this.x + this.w < obj.x) && 
+        !(obj.y + obj.height < this.y || this.y + this.h < obj.y);
     }
 
-    planeCollides(obj, scale)
+    planeCollides(obj)
     {
-        let nScale = (scale/0.4);
-        return !( (obj.x + obj.width) * nScale < this.x*scale || this.x*scale + this.w*scale < (obj.x*nScale)) && 
-        !((obj.y + obj.height) * nScale < this.y || this.y + this.h*scale < (obj.y*nScale));
+        return !( (obj.x + obj.width) < this.x || this.x + this.w < obj.x) && 
+        !((obj.y + obj.height) < this.y || this.y + this.h < obj.y);
     }
 }
 
 var lastTimestamp = 0;
 const game = new Game();
 
+var xd = null;
+
 function run(time) {
     game.step(time);
     if (!game.died)
     {
-        setTimeout(() => { requestAnimationFrame(run)}, 140);
+        xd = setTimeout(() => { requestAnimationFrame(run)}, 140);
     }
     else 
     {
@@ -461,6 +429,7 @@ function run(time) {
 
 function start()
 {
+    clearInterval(xd);
     game.start();
     requestAnimationFrame(run);
 }

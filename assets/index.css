@@ -25,6 +25,8 @@ canvas
 {
     margin-left: 1px;
     margin-top: 16%;
+    width: 50%;
+    height: auto;
     background: url("bg.png") no-repeat center;
     background-size: cover;
     image-rendering: optimizeSpeed;
@@ -42,11 +44,11 @@ canvas
 
 .btn
 {
-    padding: 30px;
+    padding: 15px;
     cursor: pointer;
     border: 0;
     outline: 0;
-    font-size: 40px;
+    font-size: 3vmax;
     -webkit-tap-highlight-color: transparent;
     margin-bottom: 30px;
     border-radius: 3px;
