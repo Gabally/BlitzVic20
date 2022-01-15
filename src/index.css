@@ -1,16 +1,14 @@
-*
-{
+* {
     font-family: 'VT323', monospace;
-    margin: 0; 
-    padding: 0; 
+    margin: 0;
+    padding: 0;
 }
 
-body
-{
+body {
     text-align: center;
-    background-image: url("pagebg.png");
+    background-image: url("assets/imgs/pagebg.png");
     background-size: 100% auto;
-    background-repeat: no-repeat; 
+    background-repeat: no-repeat;
     background-color: #201a7a;
     -ms-overflow-style: none;
     scrollbar-width: none;
@@ -19,31 +17,27 @@ body
 
 body::-webkit-scrollbar {
     display: none;
-  }
+}
 
-canvas
-{
+canvas {
     margin-left: 1px;
     margin-top: 16%;
     width: 50%;
     height: auto;
-    background: url("bg.png") no-repeat center;
+    background: url("assets/imgs/bg.png") no-repeat center;
     background-size: cover;
     image-rendering: optimizeSpeed;
     image-rendering: -moz-crisp-edges;
     image-rendering: -webkit-optimize-contrast;
-    image-rendering: -o-crisp-edges;       
+    image-rendering: -o-crisp-edges;
     image-rendering: pixelated;
 }
 
-#content
-{
+#content {
     margin-top: 18%;
 }
 
-
-.btn
-{
+.btn {
     padding: 15px;
     cursor: pointer;
     border: 0;
@@ -56,33 +50,28 @@ canvas
     background-color: rgb(112, 112, 230);
 }
 
-.btn:hover
-{
+.btn:hover {
     background-color: rgb(93, 93, 196);
 }
 
-.btn:active
-{
+.btn:active {
     background-color: rgb(93, 93, 196);
     transform: translateY(3px);
 }
 
-#notify
-{
+#notify {
     font-size: 50px;
     color: green;
     margin-bottom: 25px;
 }
 
-.smolimg
-{
+.smolimg {
     width: 14%;
     height: auto;
     vertical-align: middle;
 }
 
-.info
-{
+.info {
     margin-left: 30px;
     font-size: 2.8vmax;
     color: white;
