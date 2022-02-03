@@ -15,3 +15,4 @@ jobs:
           source: "src/*"
           target: ${{ secrets.TARGET_FOLDER }}
           rm: true
+          strip_components: 1
